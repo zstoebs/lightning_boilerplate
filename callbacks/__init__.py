@@ -1,5 +1,3 @@
-from .ConfigCallback import *
-
 import os
 from os import path
 from typing import Literal, List, Callable
