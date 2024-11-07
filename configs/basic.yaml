@@ -1,14 +1,15 @@
 seed_everything: 42
 model:  
-  class_path: models.MLP.BasicMLP # CHOOSE MODEL
+  class_path: models.BasicMLP.BasicMLP # CHOOSE MODEL
   init_args:
     lr: 1e-3 
     d_input: 2
     n_features: 256
     n_layers: 8
     n_output: 1  
+    linear_fn: layers.layers.ComplexLinear
     loss_fn: losses.MSE.MSELoss
-    act_fn: torch.nn.LeakyReLU
+    act_fn: layers.activations.Cardioid
     norm_fn: torch.nn.Identity
     metrics: 
       - class_path:  losses.MSE.NRMSELoss
@@ -18,10 +19,7 @@ data:
     batch_size: null # set to None (null) to use full image
     num_workers: 8
     use_worker_init_fn: True
-    train:
-      class_path:  data.Datasets.WrapedDataset # CHOOSE DATASET
-      init_args:  
-        shepp_or_atlas: 'shepp'
+    train: data.Datasets.WrapedDataset # CHOOSE DATASET
 trainer:
   max_epochs: 100
   log_every_n_steps: 1  # set to 1 if batch size is None
@@ -38,13 +36,13 @@ trainer:
     init_args:
       save_freq: 10
       best_only: false
-      # view_transforms: 
-      #   - class_path:  Transforms.PhaseTransform
-      #     dict_kwargs:
-      #       cmap: "gray"
-      #       vmin: -3.14
-      #       vmax: 3.14
-      #   - class_path:  Transforms.MagnitudeTransform
-      #     dict_kwargs:
-      #       cmap: "gray"
+      view_transforms: 
+        - class_path:  transforms.Transforms.PhaseTransform
+          dict_kwargs:
+            cmap: "gray"
+            vmin: -3.14
+            vmax: 3.14
+        - class_path:  transforms.Transforms.MagnitudeTransform
+          dict_kwargs:
+            cmap: "gray"
 
