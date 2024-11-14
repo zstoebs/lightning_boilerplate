@@ -1,7 +1,7 @@
 from os import path
 import numpy as np
 from . import ABCImageLogger
-from ..models.MLP import BasicMLP
+from ..models.BasicMLP import BasicMLP
 
 
 class BasicImageLogger(ABCImageLogger):
