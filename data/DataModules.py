@@ -57,6 +57,8 @@ class GenericDataModule(pl.LightningDataModule):
         val.change_stage(train=False)
         if self.datasets['validate'] is None:
             self.datasets['validate'] = val
+        else: 
+            val = deepcopy(self.datasets['validate'])
     
         if self.datasets['test'] is None:
             self.datasets['test'] = val
