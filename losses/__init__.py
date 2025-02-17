@@ -8,26 +8,19 @@ from abc import ABC, abstractmethod
 class ABCLoss(ABC, nn.Module):
     def __init__(self, 
                  loss_type: Any, 
-                 sample_inds: List[float] = [],
-                 fncs: List[nn.Module] = [nn.MSELoss()], 
                  regularizers: List[nn.Module]=[], 
                  **kwargs
                  ):
-        super().__init__()
-        assert len(fncs) > 0, 'Specify at least one loss function'
-        self.fncs = fncs
+        super().__init__(**kwargs)
         self.loss_type = loss_type  # type of loss
-        self.sample_inds = sample_inds  # indexing values if data contains multiple samples per image
-        self.regularizers = regularizers
+        self.regularizers = regularizers # list of regularizers
 
-    def forward(self, pred: torch.Tensor, target: torch.Tensor, **kwargs) -> torch.Tensor:
-        loss = 0.
-        for fnc in self.fncs:
-            loss += fnc(pred,target)
+    def forward(self, **kwargs) -> torch.Tensor:
+        loss = self.loss_fnc(**kwargs)
         
         reg_val = 0.
         for reg in self.regularizers:
-            reg_val += reg(pred, target, **kwargs)
+            reg_val += reg(**kwargs)
 
         return loss + reg_val
     
@@ -46,6 +39,10 @@ class ABCLoss(ABC, nn.Module):
     @abstractmethod
     def prepare_output(self) -> Mapping[str, torch.Tensor]:
         pass
+    
+    @abstractmethod
+    def loss_fnc(self, **kwargs) -> torch.Tensor:
+        pass
 
 
 class ABCRegularizer(ABC, nn.Module):
@@ -53,17 +50,16 @@ class ABCRegularizer(ABC, nn.Module):
                  constraints: List[nn.Module]=[],
                  update_weight: bool = False, 
                  **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.weight = nn.Parameter(torch.tensor(weight)) if update_weight else weight
         self.constraints = constraints # to apply to input before computing regularization loss
-        
-    @abstractmethod
-    def reg_fnc(self, x: torch.Tensor) -> torch.Tensor:
-        pass
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         xi = x.clone()
         for constraint in self.constraints:
             xi = constraint(xi)
         return self.weight * self.reg_fnc(xi)
-            
+    
+    @abstractmethod
+    def reg_fnc(self, x: torch.Tensor) -> torch.Tensor:
+        pass

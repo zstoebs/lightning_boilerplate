@@ -25,8 +25,10 @@ class ABCModel(ABC, pl.LightningModule):
 		
 	@abstractmethod
 	def reconstruct(self):
+		"""For reconstructing model outputs"""
 		pass
 	
 	@abstractmethod
 	def compute_metrics(self):
+		"""For computing loss, performance metrics, etc."""
 		pass
