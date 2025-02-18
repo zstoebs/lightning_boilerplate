@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import torch
 import torch.nn as nn
-from typing import Literal, List, Callable
+from typing import Literal, List, Callable, Mapping
 from inspect import isfunction
 import lightning.pytorch as pl
 
@@ -9,7 +9,10 @@ from lightning_boilerplate import ABCLoss, NRMSE
 
 
 class ABCModel(ABC, pl.LightningModule):
-	def __init__(self, loss_fn: nn.Module, metrics: List[Callable]=[NRMSE], **kwargs):
+	def __init__(self, 
+              loss_fn: nn.Module, 
+              metrics: List[Callable[...,torch.Tensor]]=[NRMSE], 
+              **kwargs):
 		super().__init__()
 		self.loss_fn = loss_fn
 		self.metrics = metrics
@@ -32,7 +35,7 @@ class ABCModel(ABC, pl.LightningModule):
 		self.scores = None
 		super().on_predict_start()
 	
-	def training_step(self, batch, batch_idx: int=0, **kwargs):
+	def training_step(self, batch, batch_idx: int=0, **kwargs) -> torch.Tensor:
 		if self.iscustom:
 			inputs = self.loss_fn.prepare_input(**batch) 
 			out = self(**inputs)
@@ -47,7 +50,7 @@ class ABCModel(ABC, pl.LightningModule):
 		loss = scores['train_loss']
 		return loss
 
-	def validation_step(self, batch, batch_idx: int=0, **kwargs):
+	def validation_step(self, batch, batch_idx: int=0, **kwargs) -> torch.Tensor:
 		if self.iscustom:
 			inputs = self.loss_fn.prepare_input(**batch) 
 			out = self(**inputs)
@@ -59,13 +62,13 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy() for key, val in outputs.items()}]
 
 		scores = self.compute_metrics(**outputs, stage='val')
-		self.scores = {key: val.detach().cpu().numpy().copy() for key, val in scores.items()} 
+		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
 		self.log_dict(scores, sync_dist=True)
 
 		loss = scores['val_loss']
 		return loss
 
-	def test_step(self, batch, batch_idx: int=0, **kwargs):
+	def test_step(self, batch, batch_idx: int=0, **kwargs) -> torch.Tensor:
 		if self.iscustom:
 			inputs = self.loss_fn.prepare_input(**batch) 
 			out = self(**inputs)
@@ -77,13 +80,13 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy() for key, val in outputs.items()}]
 
 		scores = self.compute_metrics(**outputs, stage='test')
-		self.scores = {key: val.detach().cpu().numpy().copy() for key, val in scores.items()} 
+		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
 		self.log_dict(scores, sync_dist=True)
 		
 		loss = scores['test_loss']
 		return loss
 	
-	def predict_step(self, batch, batch_idx: int=0, **kwargs):
+	def predict_step(self, batch, batch_idx: int=0, **kwargs) -> torch.Tensor:
 		if self.iscustom:
 			inputs = self.loss_fn.prepare_input(**batch) 
 			out = self(**inputs)
@@ -95,11 +98,11 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy()for key, val in outputs.items()}]
 		
 		scores = self.compute_metrics(**outputs, stage='predict')
-		self.scores = {key: val.detach().cpu().numpy().copy() for key, val in scores.items()} 
+		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
 
 		return self.outputs
 
-	def compute_metrics(self, stage: Literal['train', 'val', 'test', 'predict'], **kwargs):
+	def compute_metrics(self, stage: Literal['train', 'val', 'test', 'predict'], **kwargs) -> Mapping[str, torch.Tensor]:
 		scores = {}
 		
 		loss = self.loss_fn(**kwargs) if not stage == 'predict' else torch.tensor(0.)
