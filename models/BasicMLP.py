@@ -6,7 +6,7 @@ from torch import nn
 import lightning.pytorch as pl
 from torch.optim.optimizer import Optimizer
 
-from ..losses import ABCLoss 
+from ..losses.ABCLoss import ABCLoss 
 
 from . import ABCModel 
 

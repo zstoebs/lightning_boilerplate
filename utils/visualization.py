@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 from typing import Literal, List
 from matplotlib import pyplot as plt
 import numpy as np
-from ..transforms import ABCTransform
+from ..transforms.ABCTransform import ABCTransform
 
 
 def save_pil(save_imgs: List[np.ndarray], save_path: os.PathLike, metrics: dict = {}):
