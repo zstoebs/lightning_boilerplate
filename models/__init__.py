@@ -5,7 +5,8 @@ from typing import Literal, List, Callable, Mapping
 from inspect import isfunction
 import lightning.pytorch as pl
 
-from ..losses import ABCLoss, NRMSE
+from ..losses import ABCLoss
+from ..losses.MSE import NRMSE 
 
 
 class ABCModel(ABC, pl.LightningModule):
