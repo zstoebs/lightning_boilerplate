@@ -8,4 +8,5 @@ class ABCDataset(ABC, Dataset):
     
     @abstractmethod
     def change_stage(self): 
+        """change between train and non-train (i.e. test, predict) states"""
         pass
