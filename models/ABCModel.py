@@ -106,7 +106,7 @@ class ABCModel(ABC, pl.LightningModule):
 	def compute_metrics(self, stage: Literal['train', 'val', 'test', 'predict'], **kwargs) -> Mapping[str, torch.Tensor]:
 		scores = {}
 		
-		loss = self.loss_fn(**kwargs) if not stage == 'predict' else torch.tensor(0.)
+		loss = self.loss_fn(**kwargs) # if not stage == 'predict' else torch.tensor(0.)
 		scores[f"{stage}_loss"] = loss
 
 		for metric in self.metrics:

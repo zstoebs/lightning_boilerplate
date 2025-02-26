@@ -19,7 +19,7 @@ class MSELoss(nn.Module):
 	
 
 def NRMSE(pred: np.ndarray, target: np.ndarray, dim: Tuple[int, ...] = (0,1), **kwargs) -> np.ndarray:
-	return np.mean(np.sqrt(np.mean(np.square(np.abs(pred-target)), axis=dim)) / np.sqrt(np.mean(np.square(np.abs(target)), axis=dim)))
+	return np.mean(np.sqrt(np.mean(np.abs(pred-target)**2, axis=dim)) / np.sqrt(np.mean(np.abs(target)**2, axis=dim)))
 
 
 class NRMSELoss(nn.Module):
