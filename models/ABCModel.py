@@ -18,22 +18,22 @@ class ABCModel(ABC, pl.LightningModule):
 		self.loss_fn = loss_fn
 		self.metrics = metrics
 		self.iscustom = isinstance(loss_fn, ABCLoss)
-		self.outputs = None # for storing model outputs
-		self.scores = None # for storing metric evals
+		self.outputs = [] # list for storing model outputs
+		self.scores = {} # for storing metric evals
 
 	def on_validation_start(self):
-		self.outputs = None
-		self.scores = None
+		self.outputs = []
+		self.scores = {}
 		super().on_validation_start()
 	
 	def on_test_start(self):
-		self.outputs = None
-		self.scores = None
+		self.outputs = []
+		self.scores = {}
 		super().on_test_start()
   
 	def on_predict_start(self) -> None:
-		self.outputs = None
-		self.scores = None
+		self.outputs = []
+		self.scores = {}
 		super().on_predict_start()
 	
 	def training_step(self, batch, batch_idx: int=0, **kwargs) -> torch.Tensor:

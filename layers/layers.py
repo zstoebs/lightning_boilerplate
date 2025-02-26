@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 
+# PyTorch automatically computes Wirtinger derivatives
 class ComplexLinear(nn.Module): 
     def __init__(self, in_features: int, out_features: int, **kwargs):
         super().__init__()
