@@ -63,7 +63,7 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy() for key, val in outputs.items()}]
 
 		scores = self.compute_metrics(**outputs, stage='val')
-		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
+		self.scores = {key: val.cpu() for key, val in scores.items()} 
 		self.log_dict(scores, sync_dist=True)
 
 		loss = scores['val_loss']
