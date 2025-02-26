@@ -6,13 +6,13 @@ from inspect import isfunction
 import lightning.pytorch as pl
 
 from ..losses.ABCLoss import ABCLoss
-from ..losses.MSE import NRMSE 
+from ..losses.MSE import NRMSELoss
 
 
 class ABCModel(ABC, pl.LightningModule):
 	def __init__(self, 
               loss_fn: nn.Module, 
-              metrics: List[Callable[...,torch.Tensor]]=[NRMSE], 
+              metrics: List[Callable[...,torch.Tensor]]=[NRMSELoss], 
               **kwargs):
 		super().__init__()
 		self.loss_fn = loss_fn
@@ -81,7 +81,7 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy() for key, val in outputs.items()}]
 
 		scores = self.compute_metrics(**outputs, stage='test')
-		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
+		self.scores = {key: val.cpu() for key, val in scores.items()} 
 		self.log_dict(scores, sync_dist=True)
 		
 		loss = scores['test_loss']
@@ -99,7 +99,7 @@ class ABCModel(ABC, pl.LightningModule):
 		self.outputs += [{key: val.detach().cpu().numpy().copy()for key, val in outputs.items()}]
 		
 		scores = self.compute_metrics(**outputs, stage='predict')
-		self.scores = {key: float(val.cpu()) for key, val in scores.items()} 
+		self.scores = {key: val.cpu() for key, val in scores.items()} 
 
 		return self.outputs
 

@@ -5,6 +5,8 @@ import torch
 from typing import Union, Optional, Tuple, Callable, Any, Sequence, List
 
 
+EPS = torch.tensor(1e-8, dtype=torch.float32)
+
 def make_tensor(x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
         is_numpy = isinstance(x, np.ndarray)
         return torch.from_numpy(x.copy()) if is_numpy else x.clone()
