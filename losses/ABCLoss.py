@@ -7,12 +7,12 @@ from abc import ABC, abstractmethod
 
 class ABCLoss(ABC, nn.Module):
     def __init__(self, 
-                 loss_type: Any, 
+                 loss_type: Optional[str]=None, 
                  regularizers: List[nn.Module]=[], 
                  **kwargs
                  ):
         super().__init__(**kwargs)
-        self.loss_type = loss_type  # type of loss
+        self.loss_type = loss_type if loss_type is not None else self.__class__.__name__  # type of loss
         self.regularizers = regularizers # list of regularizers
 
     def forward(self, **kwargs) -> torch.Tensor:
@@ -23,6 +23,12 @@ class ABCLoss(ABC, nn.Module):
             reg_val += reg(**kwargs)
 
         return loss + reg_val
+    
+    def __str__(self):
+        return self.loss_type 
+
+    def __repr__(self):
+        return str(self)
     
     @abstractmethod
     def set_params(self) -> None:
