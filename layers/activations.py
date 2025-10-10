@@ -36,4 +36,5 @@ class Cardioid(nn.Module):
 class zReLU(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         xc = make_complex(x)
-        return torch.where(0 <= torch.angle(xc) % (2*np.pi) <= np.pi/2, xc, torch.tensor(0.))
+        term = torch.angle(xc) % (2*np.pi)
+        return torch.where((0 <= term) & (term <= np.pi/2), xc, torch.tensor(0.))

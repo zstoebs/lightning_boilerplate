@@ -5,6 +5,8 @@ import torch
 from typing import Union, Optional, Tuple, Callable, Any, Sequence, List
 
 
+EPS = torch.tensor(1e-8, dtype=torch.float32)
+
 def make_tensor(x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
         is_numpy = isinstance(x, np.ndarray)
         return torch.from_numpy(x.copy()) if is_numpy else x.clone()
@@ -14,7 +16,7 @@ def make_complex(x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
     compl = make_tensor(x) 
     if not torch.is_complex(compl): 
         compl = torch.view_as_complex(compl) if compl.shape[-1] == 2 else torch.complex(compl, torch.zeros_like(compl))
-    return compl
+    return compl.to(torch.cfloat)
 
 
 def make_real(x: Union[np.ndarray, torch.Tensor]) -> torch.Tensor:
