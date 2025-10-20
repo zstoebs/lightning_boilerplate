@@ -16,6 +16,8 @@ from .losses.ABCRegularizer import *
 from .losses.Constraints import *
 from .losses.MSE import *
 from .losses.Regularizers import *
+from .losses.PSNR import *
+from .losses.SSIM import *
 
 from .models.ABCModel import *
 from .models.BasicMLP import *
